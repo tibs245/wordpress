@@ -13,13 +13,15 @@ VOLUME /var/www/html
 ENV WORDPRESS_VERSION 4.3
 ENV WORDPRESS_SHA1 1e9046b584d4eaebac9e1f7292ca7003bfc8ffd7
 
-# upstream tarballs include ./wordpress/ so this gives us /usr/src/wordpress
+# upstream tarballs include ./wordpress/ so this gives us /usr/src/wordpress and delete apache.conf
 RUN curl -o wordpress.tar.gz -SL https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz \
 	&& echo "$WORDPRESS_SHA1 *wordpress.tar.gz" | sha1sum -c - \
 	&& tar -xzf wordpress.tar.gz -C /usr/src/ \
 	&& rm wordpress.tar.gz \
-	&& chown -R www-data:www-data /usr/src/wordpress
+	&& chown -R www-data:www-data /usr/src/wordpress \
+	&& rm /etc/apache2/apache.conf;
 
+COPY apache.conf /etc/apache2/apache.conf
 COPY docker-entrypoint.sh /entrypoint.sh
 
 # grr, ENTRYPOINT resets CMD now
